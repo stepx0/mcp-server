@@ -5,6 +5,7 @@ from starlette.requests import Request as StarletteRequest
 from starlette.responses import JSONResponse
 from fastmcp.server.auth import BearerAuthProvider
 from fastmcp.server.dependencies import get_access_token, AccessToken
+from database import ItemsRepository
 import jwt
 import requests
 
@@ -36,15 +37,32 @@ mcp = FastMCP(name="MCP Template", auth=auth)
 
 # '_ctx' param is used by Stytch to check auths
 @mcp.tool()
-def demo_function(_ctx) -> str:
+def get_function(_ctx) -> str:
     """This is a demo function: simulates a simple get string values"""
-    return "no data at the moment"
+    access_token: AccessToken = get_access_token()
+    user_id = access_token.client_id
+
+    items = ItemsRepository.get_items_by_user(user_id)
+    if not items:
+        return "no data at the moment"
+    
+    result = "Your items:\n"
+
+    for item in items:
+        result +=  f"{item.id}: {item.content}\n"
+
+    return result
 
 
 @mcp.tool()
 def add_function(_ctx, content: str) -> str:
     """This is a demo function: simulates a simple add string value"""
-    return f"added value: {content}"
+    access_token: AccessToken = get_access_token()
+    user_id = access_token.client_id
+
+    item = ItemsRepository.create_item(user_id, content)
+
+    return f"added value: {item.content}"
 
 
 @mcp.custom_route("/.well-known/oauth-protected-resource",
