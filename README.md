@@ -94,7 +94,7 @@ https://<random-hash>.ngrok-free.app/mcp/
 
 
 > [!WARNING]
-> The trailing '/mcp/' is required, even the slaashes.
+> The trailing '/mcp/' is required, even the slashes.
 
 ### 4. Connect via MCP Inspector
 
